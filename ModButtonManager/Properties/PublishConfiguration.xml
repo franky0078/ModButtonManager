@@ -48,7 +48,7 @@
     <AccessLevel Value="Public" />
 
 	<!--Optional discussion link.-->
-	<ForumLink Value="https://forum.paradoxplaza.com/forum/threads/enhanced-graphics-and-textures.1943428/" />
+	<ForumLink Value="https://forum.paradoxplaza.com/forum/threads/mod-button-manager.1946090/" />
 
-	<ExternalLink Type="github" Url="https://github.com/franky0078/Enhanced-Graphics-and-Textures" />
+	<ExternalLink Type="github" Url="https://github.com/franky0078/ModButtonManager" />
 </Publish>
