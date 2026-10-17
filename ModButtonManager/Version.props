@@ -1,0 +1,6 @@
+<Project>
+  <!-- Change only this value, then rebuild the project. -->
+  <PropertyGroup>
+    <Version>0.9.0</Version>
+  </PropertyGroup>
+</Project>

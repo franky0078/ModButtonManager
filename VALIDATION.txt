@@ -1,0 +1,41 @@
+Mod Button Manager 0.1.0 — validation on 2026-10-17
+
+User confirmed the previous selection and latency corrections work in CS2.
+This revision adds native panel blur, FR/IT/ES translations and centralized versioning.
+
+PASSED: Dependency-free frontend build.
+PASSED: JavaScript source, generated runtime and fixture syntax checks.
+PASSED: C# project, Version.props and publish XML parsing; Unity.Collections retained.
+PASSED: All five languages; 55 unique source texts covered in each additional language.
+PASSED: Isolated version test changes only Version.props to 9.8.7 and verifies
+        UI metadata/package/banner, publish metadata and README propagation.
+PASSED: Missing French translation causes an explicit build failure.
+PASSED: 1,620 layout boundary cases.
+PASSED: 25 React browser scenarios using simulated CS2 bindings:
+  - Optimistic checkbox state and DOM changes before a delayed backend acknowledgement.
+  - Pending selection survives unrelated resize/config updates before acknowledgement.
+  - Source visibility updates within 400 ms without waiting for the 750-ms fallback.
+  - Hiding/showing the Game UI immediately hides/shows its previews.
+  - Live language switching for DE/EN/FR/IT/ES with original mod instances retained.
+  - Native panel theme, separate 15-rem blur layer, full opacity and no pointer interception.
+  - Shared hooks, CSS contract, size, original component state and event handlers.
+  - Detection fallback, polling and translated/scaled UI parents.
+  - Permanent opening and independent left/right directions and saved positions.
+  - Launcher settings opened with right-down alone; contextmenu deduplication.
+  - Options binding enables visibility editing in both settings and manager menu.
+  - Excluded originals return to the native toolbar immediately and remain usable.
+  - Excluded previews have 40% opacity and do not activate the original mod.
+  - Preview reflects native original state; reinclusion does not remount originals.
+  - Disabling edit mode removes previews; exclusions remain in the normal UI.
+  - Right-down selection with and without a following contextmenu; no double-toggle.
+  - Escape/outside clicks leave editing enabled until the explicit option is disabled.
+  - Conditional launchers, paging, source filtering and viewport bounds.
+  - Position lock and separated bars without overlap.
+  - Deactivation and teardown remove previews and owned DOM state; no JS errors.
+
+NOT RUN: C# compilation against the local CS2 Modding SDK / game assemblies.
+NOT RUN: Actual Gameface blur rendering, translated native options UI and DLL version display.
+NOT RUN: Paradox publishing.
+
+No DLL is shipped. Rebuild the complete project and deploy DLL/MJS/CSS together.
+The changed-file table is in README.md; the in-game checklist is in TESTING.md.

@@ -1,0 +1,77 @@
+/* CS2 scales rem units with its interface scale. Original buttons keep their size. */
+.mbm-source { display: flex; flex-direction: inherit; align-items: inherit; flex: 0 0 auto; }
+[data-mbm-managed="true"] {
+    position: fixed !important;
+    left: var(--mbm-left) !important;
+    top: var(--mbm-top) !important;
+    right: auto !important;
+    bottom: auto !important;
+    margin: 0 !important;
+    z-index: 1100 !important;
+}
+[data-mbm-hidden="true"], [data-mbm-hidden="true"] * {
+    visibility: hidden !important;
+    pointer-events: none !important;
+}
+[data-mbm-highlight="true"] { outline: 3rem solid #62d3ff !important; outline-offset: 2rem; }
+[data-mbm-excluded="true"] { opacity: 0.4 !important; }
+.mbm-ui { pointer-events: none; font-size: 14rem; color: #edf6ff; }
+.mbm-ui, .mbm-ui *, .mbm-editor, .mbm-editor * { box-sizing: border-box; }
+.mbm-ui button, .mbm-ui input, .mbm-editor-body button { font: inherit; }
+.mbm-launcher, .mbm-controls, .mbm-editor { position: fixed; pointer-events: auto; z-index: 1200; }
+.mbm-ui .mbm-controls button, .mbm-editor .mbm-editor-body button {
+    color: #edf6ff; background: #263c50; border: 1rem solid #52718a;
+    border-radius: 4rem; cursor: pointer;
+}
+.mbm-ui .mbm-controls button:hover, .mbm-editor .mbm-editor-body button:hover { background: #3e607b; }
+.mbm-ui button:focus-visible, .mbm-editor button:focus-visible { outline: 2rem solid #67d5ff; }
+.mbm-ui button.mbm-selected, .mbm-editor button.mbm-selected { background: #28799e; border-color: #75dcff; }
+.mbm-ui button:disabled, .mbm-editor button:disabled { opacity: 0.4; cursor: default; }
+.mbm-ui button.mbm-launcher {
+    width: 40rem; height: 40rem; padding: 5rem; display: flex;
+    justify-content: center; align-items: center; color: #fff;
+    background-color: rgba(76, 188, 226, 0.95); border: 0; border-radius: 7rem;
+    flex-shrink: 0; box-shadow: none;
+}
+.mbm-ui button.mbm-launcher:hover,
+.mbm-ui button.mbm-launcher.mbm-selected { background-color: rgba(95, 201, 235, 0.95); border: 0; }
+.mbm-ui button.mbm-launcher.mbm-selecting { outline: 2rem solid #fff; outline-offset: 2rem; }
+.mbm-launcher svg { width: 28rem; height: 28rem; }
+.mbm-badge {
+    position: absolute; right: -4rem; bottom: -4rem; min-width: 17rem; height: 17rem;
+    line-height: 17rem; padding: 0 2rem; font-size: 10rem; background: #142432; border-radius: 9rem;
+}
+.mbm-controls { display: flex; align-items: center; height: 25rem; white-space: nowrap; }
+.mbm-controls button { min-width: 25rem; height: 25rem; margin-right: 3rem; padding: 0 4rem; }
+.mbm-controls span { padding: 0 4rem; background: #142432; }
+.mbm-controls svg { width: 16rem; height: 16rem; }
+/* The native cs2/ui Panel owns the window background, blur, header and close
+   button. Do not paint an opaque custom backdrop over the game's panel. */
+.mbm-editor { width: 370rem; max-width: calc(100vw - 16rem); }
+.mbm-editor-body { padding: 12rem; max-height: calc(85vh - 56rem); overflow-y: auto; }
+.mbm-editor button.mbm-check {
+    display: flex; align-items: center; width: 100%; min-height: 27rem;
+    padding: 3rem 0; border: 0; border-radius: 3rem;
+    background: transparent; text-align: left; color: #fff;
+}
+.mbm-editor button.mbm-check:hover { background: rgba(76, 188, 226, 0.16); }
+.mbm-check-box {
+    display: flex; justify-content: center; align-items: center;
+    width: 16rem; height: 16rem; min-width: 16rem; flex-shrink: 0;
+    margin-right: 9rem; border: 1rem solid rgba(255, 255, 255, 0.8); border-radius: 2rem;
+    background: rgba(16, 29, 35, 0.85); color: #fff;
+}
+.mbm-check[aria-checked="true"] .mbm-check-box { background: #50a0be; }
+.mbm-check-box svg { width: 16rem; height: 16rem; }
+.mbm-check-text { min-width: 0; }
+.mbm-option { display: flex; align-items: center; justify-content: space-between; margin: 9rem 0; }
+.mbm-choices { display: flex; }
+.mbm-choices button { padding: 5rem 8rem; min-width: 30rem; margin-left: 4rem; font-size: 12rem; }
+.mbm-selection-title { margin-top: 12rem; border-top: 1rem solid #52718a; padding-top: 10rem; font-weight: bold; }
+.mbm-hint { font-size: 12rem; line-height: 17rem; color: #bdcddd; margin: 6rem 0 9rem; }
+.mbm-list { max-height: 210rem; overflow-y: auto; }
+.mbm-editor button.mbm-item { padding: 4rem; border-radius: 3rem; }
+
+.mbm-item .mbm-check-text { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.mbm-unsupported { opacity: 0.5; }
+.mbm-reset { width: 100%; margin-top: 12rem; padding: 7rem; }

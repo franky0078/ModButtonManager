@@ -1,0 +1,54 @@
+<Publish>
+      
+	<ModId Value="" />
+      
+	<DisplayName Value="Mod Button Manager" />
+      
+	<ShortDescription Value="Collect selected mod launcher buttons in a compact dock with one or two rows." />
+    
+	<LongDescription>		
+        Mod Button Manager groups supported mod launcher buttons behind one movable button.
+
+        - Open below, to the right or to the left.
+        - Choose one or two rows.
+        - Select which detected buttons belong in the dock.
+        - Choose one shared launcher or separate launchers for left and right.
+        - Keep button bars open until explicitly collapsed.
+        - Save independent launcher positions and open states.
+        - Enable Hide buttons in options to edit the selection with right-click.
+        - Excluded originals return to the normal UI; selection previews have 40% opacity.
+        - Disable the selection option to remove previews from the manager.
+        - Light-blue launcher style matching existing mod buttons.
+        - Keep original mod button components and click handlers.
+        - English and German interface.
+
+    </LongDescription>
+
+	<Thumbnail Value="Properties/Thumbnail.jpg" />
+
+    <!-- Screenshots -->
+    <Screenshot Value="Properties/Screenshot01.jpg" />
+    <Screenshot Value="Properties/Screenshot02.jpg" />
+    <Screenshot Value="Properties/Screenshot03.jpg" />
+    <Screenshot Value="Properties/Screenshot04.jpg" />
+    <Screenshot Value="Properties/Screenshot05.jpg" />
+	<!--<Screenshot Value="Properties/Screenshot06.jpg" />
+    <Screenshot Value="Properties/Screenshot07.jpg" />
+    <Screenshot Value="Properties/Screenshot08.jpg" />
+    <Screenshot Value="Properties/Screenshot09.jpg" />
+    <Screenshot Value="Properties/Screenshot10.jpg" />-->
+	
+    <Tag Value="Code Mod" />
+    <ModVersion Value="0.9.0" />
+    <GameVersion Value="1.6.*" />
+    <ChangeLog>
+	  
+	    Initial release
+    </ChangeLog>
+    <AccessLevel Value="Public" />
+
+	<!--Optional discussion link.-->
+	<ForumLink Value="https://forum.paradoxplaza.com/forum/threads/enhanced-graphics-and-textures.1943428/" />
+
+	<ExternalLink Type="github" Url="https://github.com/franky0078/Enhanced-Graphics-and-Textures" />
+</Publish>

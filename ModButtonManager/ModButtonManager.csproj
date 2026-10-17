@@ -1,0 +1,41 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <Import Project="Version.props" />
+  <PropertyGroup>
+    <TargetFramework>net472</TargetFramework>
+    <LangVersion>latest</LangVersion>
+    <AssemblyName>ModButtonManager</AssemblyName>
+    <RootNamespace>ModButtonManager</RootNamespace>
+    <AssemblyVersion>$(Version).0</AssemblyVersion>
+    <FileVersion>$(Version).0</FileVersion>
+    <Configurations>Debug;Release</Configurations>
+    <PublishConfigurationPath>Properties\PublishConfiguration.xml</PublishConfigurationPath>
+    <CS2ToolPath Condition="'$(CS2ToolPath)' == ''">$([System.Environment]::GetEnvironmentVariable('CSII_TOOLPATH', 'EnvironmentVariableTarget.User'))</CS2ToolPath>
+    <DefaultItemExcludes>Frontend\build\**;Frontend\node_modules\**;$(DefaultItemExcludes)</DefaultItemExcludes>
+    <DisableFastUpToDateCheck>true</DisableFastUpToDateCheck>
+  </PropertyGroup>
+  <Import Project="$(CS2ToolPath)\Mod.props" Condition="Exists('$(CS2ToolPath)\Mod.props')" />
+  <Import Project="$(CS2ToolPath)\Mod.targets" Condition="Exists('$(CS2ToolPath)\Mod.targets')" />
+  <ItemGroup>
+    <Reference Include="Game"><Private>false</Private></Reference>
+    <Reference Include="Colossal.Core"><Private>false</Private></Reference>
+    <Reference Include="Colossal.Logging"><Private>false</Private></Reference>
+    <Reference Include="Colossal.IO.AssetDatabase"><Private>false</Private></Reference>
+    <Reference Include="Colossal.UI"><Private>false</Private></Reference>
+    <Reference Include="Colossal.UI.Binding"><Private>false</Private></Reference>
+    <Reference Include="Colossal.Localization"><Private>false</Private></Reference>
+    <Reference Include="UnityEngine.CoreModule"><Private>false</Private></Reference>
+    <Reference Include="Unity.Entities"><Private>false</Private></Reference>
+    <Reference Include="Unity.Collections"><Private>false</Private></Reference>
+    <Reference Update="System"><Private>false</Private></Reference>
+    <Reference Update="System.Core"><Private>false</Private></Reference>
+    <None Include="Frontend\build\ModButtonManager.mjs" CopyToOutputDirectory="PreserveNewest" TargetPath="ModButtonManager.mjs" />
+    <None Include="Frontend\build\ModButtonManager.css" CopyToOutputDirectory="PreserveNewest" TargetPath="ModButtonManager.css" />
+  </ItemGroup>
+  <Target Name="CheckLocalSdk" BeforeTargets="PrepareForBuild">
+    <Error Condition="!Exists('$(CS2ToolPath)\Mod.props') Or !Exists('$(CS2ToolPath)\Mod.targets')"
+      Text="CS2 Modding SDK fehlt. CSII_TOOLPATH setzen oder /p:CS2ToolPath=... angeben." />
+  </Target>
+  <Target Name="BuildDockUI" BeforeTargets="PrepareForBuild" DependsOnTargets="CheckLocalSdk">
+    <Exec Command="node build.mjs" WorkingDirectory="$(MSBuildProjectDirectory)\Frontend" />
+  </Target>
+</Project>
