@@ -1,5 +1,11 @@
 **Mod Button Manager**
 
+<p align="center">
+  <img src="ModButtonManager/Properties/Thumbnail.jpg"
+       alt="ModButtonManager"
+       width="600">
+</p>
+
 Keep your interface organized by collecting supported mod buttons in a compact, customizable menu.
 
 Choose one button for all your mods or separate buttons for the left and right sides of the screen. Decide which buttons belong in the manager and keep the others in their original positions.

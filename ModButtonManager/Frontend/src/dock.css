@@ -1,5 +1,4 @@
 /* CS2 scales rem units with its interface scale. Original buttons keep their size. */
-.mbm-source { display: flex; flex-direction: inherit; align-items: inherit; flex: 0 0 auto; }
 [data-mbm-managed="true"] {
     position: fixed !important;
     left: var(--mbm-left) !important;
@@ -69,7 +68,7 @@
 .mbm-choices button { padding: 5rem 8rem; min-width: 30rem; margin-left: 4rem; font-size: 12rem; }
 .mbm-selection-title { margin-top: 12rem; border-top: 1rem solid #52718a; padding-top: 10rem; font-weight: bold; }
 .mbm-hint { font-size: 12rem; line-height: 17rem; color: #bdcddd; margin: 6rem 0 9rem; }
-.mbm-list { max-height: 210rem; overflow-y: auto; }
+.mbm-list { height: 210rem; min-height: 100rem; flex-shrink: 0; }
 .mbm-editor button.mbm-item { padding: 4rem; border-radius: 3rem; }
 
 .mbm-item .mbm-check-text { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }

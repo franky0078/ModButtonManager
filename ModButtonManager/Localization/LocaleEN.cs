@@ -60,7 +60,7 @@ namespace ModButtonManager.Localization
             { "Prevent dragging all launcher buttons. Opening and closing remains available.", "Prevent dragging all launcher buttons. Opening and closing remains available." },
             { "Enable to right-click buttons in the manager. Excluded originals return to the game UI; 40% opacity previews remain in the manager. Disable to hide previews and finish selection.", "Enable to right-click buttons in the manager. Excluded originals return to the game UI; 40% opacity previews remain in the manager. Disable to hide previews and finish selection." },
             { "Use one button for all mod launchers, or separate buttons for left and right. Each position is saved separately.", "Use one button for all mod launchers, or separate buttons for left and right. Each position is saved separately." },
-            { "Arrange collected buttons in one or two rows. Large collections use pages.", "Arrange collected buttons in one or two rows. Large collections use pages." },
+            { "Arrange collected buttons in one, two or three rows. Large collections use pages.", "Arrange collected buttons in one, two or three rows. Large collections use pages." },
             { "Also collect top-left mod buttons", "Also collect top-left mod buttons" },
             { "Optional. Only small launcher buttons in the shared mod UI hooks are collected; large panels are excluded.", "Optional. Only small launcher buttons in the shared mod UI hooks are collected; large panels are excluded." },
             { "Restore the position, layout and button selection. Does not change other mods.", "Restore the position, layout and button selection. Does not change other mods." },

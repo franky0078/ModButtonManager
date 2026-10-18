@@ -69,7 +69,7 @@ namespace ModButtonManager.Systems
                 settings.RightDirection = (DockDirection)rightDirection;
             else if (key == "locked" && bool.TryParse(value, out bool locked)) settings.LockPositions = locked;
             else if (key == "editVisibility" && bool.TryParse(value, out bool editVisibility)) settings.EditButtonVisibility = editVisibility;
-            else if (key == "rows" && int.TryParse(value, out int rows) && rows >= 1 && rows <= 2) settings.Rows = rows;
+            else if (key == "rows" && int.TryParse(value, out int rows) && rows >= 1 && rows <= 3) settings.Rows = rows;
             else return;
             settings.ApplyAndSave();
         }

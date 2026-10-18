@@ -36,7 +36,7 @@ namespace ModButtonManager.Settings
             Option(entries, nameof(Setting.Grouping), "Launcher buttons",
                 "Use one button for all mod launchers, or separate buttons for left and right. Each position is saved separately.");
             Option(entries, nameof(Setting.Rows), "Rows",
-                "Arrange collected buttons in one or two rows. Large collections use pages.");
+                "Arrange collected buttons in one, two or three rows. Large collections use pages.");
             Option(entries, nameof(Setting.IncludeTopLeft), "Also collect top-left mod buttons",
                 "Optional. Only small launcher buttons in the shared mod UI hooks are collected; large panels are excluded.");
             Option(entries, nameof(Setting.ResetDock), "Reset dock",

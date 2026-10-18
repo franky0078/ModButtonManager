@@ -1,4 +1,5 @@
 import { DockController, nearest } from "./dock.mjs";
+console.log("[ModButtonManager] UI build: independent-docks-1");
 
 // CS2's UI loader only requests the matching .css file for modules with this
 // named export (the same contract used by CSSPresencePlugin in the other mods).
@@ -8,7 +9,7 @@ const React = window.React;
 const { createElement: h, useEffect, useLayoutEffect, useRef, useState } = React;
 const { bindValue, useValue, trigger } = window["cs2/api"];
 const { useLocalization } = window["cs2/l10n"];
-const { Panel, Tooltip } = window["cs2/ui"];
+const { Panel, Tooltip, Scrollable } = window["cs2/ui"];
 const group = "modButtonManager";
 const bindings = {
     enabled: bindValue(group, "enabled", false),
@@ -66,7 +67,7 @@ function Dock({ side, grouping, editing, selecting, setEditor, setSelection }) {
     const directionKey = side === "all" ? "direction" : `${side}Direction`;
     const direction = useValue(bindings[directionKey]);
     const locked = useValue(bindings.locked);
-    const rows = Math.max(1, Math.min(2, useValue(bindings.rows)));
+    const rows = Math.max(1, Math.min(3, useValue(bindings.rows)));
     const x = useValue(bindings[side === "all" ? "x" : `${side}X`]);
     const y = useValue(bindings[side === "all" ? "y" : `${side}Y`]);
     const openKey = side === "all" ? "open" : `${side}Open`;
@@ -216,7 +217,7 @@ function Dock({ side, grouping, editing, selecting, setEditor, setSelection }) {
                 check("EditVisibility", selecting, value => setSelection(value)),
                 choose("Grouping", grouping, [{ value: 0, label: t("Combined") }, { value: 1, label: t("Separate") }]),
                 choose("Direction", direction, [0, 1, 2].map((value, index) => ({ value, label: t(["Below", "Right", "Left"][index]) })), directionKey),
-                choose("Rows", rows, [1, 2].map(value => ({ value, label: String(value) }))),
+                choose("Rows", rows, [1, 2, 3].map(value => ({ value, label: String(value) }))),
                 h("button", { type: "button", className: "mbm-reset", onClick: () => {
                     setOption("enabled", true); changeOpen(true); setEditor(null); setSelection(!selecting);
                 } }, t(selecting ? "FinishSelection" : "SelectButtons")),
@@ -224,7 +225,7 @@ function Dock({ side, grouping, editing, selecting, setEditor, setSelection }) {
                 h("p", { className: "mbm-hint" }, t("SelectionHint")),
                 !hookAvailable && h("p", { className: "mbm-hint" }, t("Unavailable")),
                 view.items.length === 0 && h("p", { className: "mbm-hint" }, t("Empty")),
-                h("div", { className: "mbm-list" }, view.items.map(item => h(Checkbox, {
+                h(Scrollable, { className: "mbm-list", vertical: true, horizontal: false, trackVisibility: "scrollable" }, view.items.map(item => h(Checkbox, {
                     key: item.id, className: `mbm-item ${item.supported ? "" : "mbm-unsupported"}`,
                     label: item.name, checked: item.supported && !excludedIds.has(item.id),
                     disabled: !item.supported || !selecting,
@@ -243,8 +244,25 @@ export default function register(registry) {
     try {
         if (typeof registry.get(path, "ModdingHook") !== "function") throw new Error("ModdingHook unavailable");
         registry.extend(path, "ModdingHook", Previous => function DockScope(props) {
-            if (props.name !== "GameTopRight" && props.name !== "GameTopLeft") return h(Previous, props);
-            return h("div", { "data-mbm-scope": props.name, className: "mbm-source" }, h(Previous, props));
+            const start = useRef(null);
+            const tracked = props.name === "GameTopRight" || props.name === "GameTopLeft";
+            useLayoutEffect(() => {
+                if (!tracked || !start.current?.parentElement) return;
+                const parent = start.current.parentElement;
+                const previous = parent.getAttribute("data-mbm-scope");
+                parent.setAttribute("data-mbm-scope", props.name);
+                return () => {
+                    if (previous === null) parent.removeAttribute("data-mbm-scope");
+                    else parent.setAttribute("data-mbm-scope", previous);
+                };
+            }, [tracked, props.name]);
+            if (!tracked) return h(Previous, props);
+            // Invisible range markers preserve the original flex parent, child
+            // selectors and spacing. No wrapper remains when the dock is off.
+            return h(React.Fragment, null,
+                h("span", { ref: start, "data-mbm-start": props.name, style: { display: "none" } }),
+                h(Previous, props),
+                h("span", { "data-mbm-end": props.name, style: { display: "none" } }));
         });
         hookAvailable = true;
     } catch (error) {

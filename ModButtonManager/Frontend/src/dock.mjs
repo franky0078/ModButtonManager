@@ -64,8 +64,6 @@ export function buttonSignature(button, scope) {
 
 function visible(element) {
     if (!attached(element)) return false;
-    // Our own visibility:hidden is intentional for a closed dock. Do not
-    // confuse it with the source mod removing/hiding its launcher.
     const managed = nearest(element, `[${MANAGED}="true"]`);
     let belowManaged = !!managed;
     for (let current = element; current; current = current.parentElement) {
@@ -78,26 +76,47 @@ function visible(element) {
     return true;
 }
 
-function carrierFor(button, scope) {
-    let carrier = button;
-    for (let parent = button.parentElement; parent && parent !== scope; parent = parent.parentElement) {
-        const rect = parent.getBoundingClientRect();
-        if (rect.width > 112 || rect.height > 112 ||
-            parent.querySelectorAll("button, [role=button], input, select, textarea").length !== 1) break;
-        if (rect.width > 0 && rect.height > 0) carrier = parent;
-    }
-    return carrier;
+function carrierFor(button) {
+
+    return button;
 }
 
-function eligible(button, scope) {
+function inHookRange(element, scope) {
+
+    let child = element;
+    while (child && child.parentElement !== scope) child = child.parentElement;
+    if (!child) return false;
+    const name = scope.getAttribute("data-mbm-scope");
+    for (let sibling = child.previousSibling; sibling; sibling = sibling.previousSibling) {
+        if (sibling.getAttribute?.("data-mbm-end") === name) return false;
+        if (sibling.getAttribute?.("data-mbm-start") === name) return true;
+    }
+    return false;
+}
+
+function trafficToolLaunchers(scope) {
+    // TTE's FloatingButton is a div inside its direct Tooltip wrapper. Its
+    // panels are siblings, and also contain images: never scan all clickable
+    // divs or all icons in the mod root. Support both vanilla and fallback CSS.
+    return Array.from(scope.querySelectorAll("#c2vm-tle > div > div > img"))
+        .filter(icon => icon.parentElement.children.length === 1 &&
+            icon.parentElement.parentElement.children.length === 1)
+        .map(icon => icon.parentElement);
+}
+
+function eligible(button, scope, launcherRoot = null) {
     if (nearest(button, "[data-mbm-ui], [role=dialog], [role=menu], [role=listbox]")) return false;
+    if (nearest(button.parentElement, "button, [role=button]")) return false;
     if (!visible(button)) return false;
     const rect = button.getBoundingClientRect();
     if (rect.width < 12 || rect.height < 12 || rect.width > 96 || rect.height > 96) return false;
     // GameTopLeft is also used for windows. Do not grab their action buttons.
-    for (let parent = button.parentElement; parent && parent !== scope; parent = parent.parentElement) {
+    for (let parent = button.parentElement; parent && parent !== scope && parent !== launcherRoot; parent = parent.parentElement) {
         const bounds = parent.getBoundingClientRect();
-        if ((bounds.height > 112 && bounds.width > 112) ||
+        // Narrow vertical tool panels (for example Network Tools) are not
+        // launchers either. Their controls must remain in the source panel.
+        // Prefer leaving an ambiguous toolbar untouched to stealing its tools.
+        if (bounds.height > 112 ||
             parent.querySelector("input, select, textarea, [role=slider]")) return false;
     }
     return true;
@@ -152,7 +171,10 @@ export function calculateLayout(anchor, count, direction, requestedRows, viewpor
     if (direction === 1 || direction === 2) {
         const available = direction === 1 ? viewport.width - anchor.right - gap - margin : anchor.left - gap - margin;
         maximumColumns = Math.min(screenColumns, Math.floor(available / cell));
-        if (maximumColumns < 1) { resolvedDirection = 0; maximumColumns = screenColumns; }
+        if (maximumColumns < 1 || (count > maximumColumns * rows && count <= screenColumns * rows)) {
+            resolvedDirection = 0;
+            maximumColumns = screenColumns;
+        }
     }
     const capacity = Math.max(1, maximumColumns * rows);
     const columns = Math.min(maximumColumns, Math.max(1, Math.ceil(Math.min(count, capacity) / rows)));
@@ -165,7 +187,7 @@ export function calculateLayout(anchor, count, direction, requestedRows, viewpor
         top = anchor.top - gap - height;
     left = Math.max(margin, Math.min(left, viewport.width - width - margin));
     top = Math.max(margin, Math.min(top, viewport.height - height - margin));
-    return { left, top, columns, rows, cell, capacity, pages: Math.max(1, Math.ceil(count / capacity)) };
+    return { left, top, width, height, columns, rows, cell, capacity, pages: Math.max(1, Math.ceil(count / capacity)) };
 }
 
 export class DockController {
@@ -193,8 +215,7 @@ export class DockController {
             if (!this.config.selecting || !this.open) return;
             let item = this.renderedItems.find(item => item.supported && contains(item.carrier, event.target) &&
                 item.carrier.getAttribute(MANAGED) === "true" && item.carrier.getAttribute(HIDDEN) !== "true");
-            // The right-down can restore an original or remove a preview before
-            // the rest of the same mouse gesture arrives. Consume that tail too.
+
             const tail = event.type !== "mousedown" && (event.button === 2 || event.type === "contextmenu");
             if (!item && tail && this.selectionGesture && Date.now() - this.selectionGesture.time < 1000 &&
                 contains(this.selectionGesture.carrier, event.target))
@@ -203,8 +224,7 @@ export class DockController {
             event.preventDefault();
             event.stopPropagation();
             event.stopImmediatePropagation?.();
-            // Gameface may omit contextmenu after a cancelled mouse event.
-            // Handle right-down directly and suppress the trailing contextmenu.
+
             const rightDown = event.type === "mousedown" && (event.button === 2 || event.which === 3);
             const duplicateMenu = event.type === "contextmenu" && this.lastRightDown?.id === item.id &&
                 Date.now() - this.lastRightDown.time < 1000;
@@ -228,22 +248,16 @@ export class DockController {
         this.observer = typeof MutationObserver === "function" ? new MutationObserver(records => {
             if (records.some(record => {
                 if (nearest(record.target, "[data-mbm-ui]")) return false;
-                // Ignore our own positioning writes, but react immediately to
-                // foreign class/style/visibility changes instead of polling.
                 return record.type !== "attributes" || record.attributeName !== "style" ||
                     this.appliedStyles.get(record.target) !== record.target.getAttribute("style");
             })) this.settle();
         }) : null;
-        // A bounded scan of the mod hook wrappers catches inline style changes,
-        // conditional launchers and React replacing a class attribute.
         this.timer = setInterval(this.request, 750);
         window.addEventListener("resize", this.request);
         this.refresh();
     }
 
     settle() {
-        // Gameface computes styles over multiple frames. A bounded follow-up
-        // resolves the new geometry without waiting for the 750-ms fallback.
         this.settleFrames = 2;
         this.request();
     }
@@ -307,8 +321,6 @@ export class DockController {
             carrier.style.display = "flex";
             carrier.style.alignItems = "center";
             carrier.style.justifyContent = "center";
-            // Keep previews inside the same Game UI lifecycle and visibility
-            // tree as the launcher, including menu transitions and unmount.
             (nearest(this.anchor, "[data-mbm-ui]") || this.anchor.parentElement).appendChild(carrier);
             preview = { carrier, markup: null };
             this.previews.set(item.id, preview);
@@ -342,10 +354,16 @@ export class DockController {
                 }
                 const style = computed(originals[index]);
                 for (const property of ["width", "height", "color", "background-color", "background-image",
-                    "border", "border-radius", "padding", "box-sizing", "display", "align-items", "justify-content",
-                    "font-size", "font-family", "fill", "stroke", "mask-image", "mask-size", "mask-position", "mask-repeat",
-                    "-webkit-mask-image", "-webkit-mask-size", "-webkit-mask-position", "-webkit-mask-repeat"])
-                    if (style.getPropertyValue(property)) node.style.setProperty(property, style.getPropertyValue(property));
+                    "padding-top", "padding-right", "padding-bottom", "padding-left",
+                    "border-top-width", "border-right-width", "border-bottom-width", "border-left-width",
+                    "border-top-style", "border-right-style", "border-bottom-style", "border-left-style",
+                    "border-top-color", "border-right-color", "border-bottom-color", "border-left-color",
+                    "border-top-left-radius", "border-top-right-radius", "border-bottom-right-radius", "border-bottom-left-radius",
+                    "display", "align-items", "justify-content", "font-size", "font-family",
+                    "fill", "stroke", "mask-image", "mask-size", "mask-position", "mask-repeat"]) {
+                    const value = style.getPropertyValue(property);
+                    if (value && value !== "auto" && value !== "initial") node.style.setProperty(property, value);
+                }
                 node.setAttribute("tabindex", "-1");
             });
             copy.style.position = "relative";
@@ -372,8 +390,6 @@ export class DockController {
 
     refresh() {
         if (this.stopped || !attached(this.anchor)) return;
-        // Gameface resolves computed styles asynchronously. Keep captured nodes
-        // in place instead of restoring and immediately re-reading stale styles.
         const previous = new Map(this.items.map(item => [item.button, item]));
         const items = [];
         const duplicates = new Map();
@@ -391,15 +407,17 @@ export class DockController {
             if (this.config.source === "left" && target !== "GameTopLeft") continue;
             if (this.config.source === "right" && target !== "GameTopRight") continue;
             if (scope.getAttribute("data-mbm-scope") === "GameTopLeft" && !this.config.topLeft) continue;
-            for (const button of Array.from(scope.querySelectorAll("button, [role=button]"))) {
+            const trafficLaunchers = new Set(trafficToolLaunchers(scope));
+            for (const button of [...Array.from(scope.querySelectorAll("button, [role=button]")), ...trafficLaunchers]) {
                 candidates++;
-                if (nearest(button, "[data-mbm-scope]") !== scope || seen.has(button) || !eligible(button, scope)) continue;
+                const launcherRoot = trafficLaunchers.has(button) ? nearest(button, "#c2vm-tle") : null;
+                if (nearest(button, "[data-mbm-scope]") !== scope || !inHookRange(button, scope) || seen.has(button) || !eligible(button, scope, launcherRoot)) continue;
                 seen.add(button);
                 const signature = buttonSignature(button, scope);
                 const occurrence = duplicates.get(signature) || 0;
                 duplicates.set(signature, occurrence + 1);
                 const old = previous.get(button);
-                const carrier = old && attached(old.carrier) && contains(old.carrier, button) ? old.carrier : carrierFor(button, scope);
+                const carrier = carrierFor(button);
                 const context = positioningContext(carrier);
                 items.push({ id: old ? old.id : `${signature}-${occurrence}`, button, carrier,
                     context, name: nameFor(button, this.generic, items.length), supported: !!context });
@@ -433,26 +451,8 @@ export class DockController {
             return Math.max(max, rect.width, rect.height);
         }, 40 * scale);
         const cell = maximumSize + 8 * scale;
-        let regionLeft = 0;
-        let regionWidth = window.innerWidth;
-        if (this.config.source === "left" || this.config.source === "right") {
-            const other = document.querySelector(`[data-mbm-side="${this.config.source === "left" ? "right" : "left"}"]`);
-            if (other && attached(other)) {
-                const otherRect = other.getBoundingClientRect();
-                const center = (anchor.left + anchor.right) / 2;
-                const otherCenter = (otherRect.left + otherRect.right) / 2;
-                const minimum = Math.min(window.innerWidth / 2, cell * 1.5);
-                const boundary = Math.max(minimum, Math.min(window.innerWidth - minimum, (center + otherCenter) / 2));
-                const onLeft = center < otherCenter || (center === otherCenter && this.config.source === "left");
-                regionLeft = onLeft ? 0 : boundary;
-                regionWidth = onLeft ? boundary : window.innerWidth - boundary;
-            }
-        }
-        const localAnchor = { left: anchor.left - regionLeft, right: anchor.right - regionLeft,
-            top: anchor.top, bottom: anchor.bottom };
-        const layout = calculateLayout(localAnchor, collected.length, this.config.direction, this.config.rows,
-            { width: regionWidth, height: window.innerHeight }, cell);
-        layout.left += regionLeft;
+        const viewport = { width: window.innerWidth, height: window.innerHeight };
+        const layout = calculateLayout(anchor, collected.length, this.config.direction, this.config.rows, viewport, cell);
         this.page = Math.min(this.page, layout.pages - 1);
         const start = this.page * layout.capacity;
         collected.forEach((item, index) => {

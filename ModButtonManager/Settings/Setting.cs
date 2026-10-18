@@ -45,7 +45,7 @@ namespace ModButtonManager.Settings
         [SettingsUIHidden]
         public bool EnableExclusions { get; set; }
 
-        [SettingsUISlider(min = 1, max = 2, step = 1, scalarMultiplier = 1)]
+        [SettingsUISlider(min = 1, max = 3, step = 1, scalarMultiplier = 1)]
         [SettingsUISection(GeneralTab, LayoutGroup)]
         public int Rows { get; set; }
 

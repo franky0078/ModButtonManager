@@ -29,6 +29,12 @@ Disable selection mode when finished. The previews disappear, leaving only your 
 - **Right-click** a launcher to open the settings.
 - **Drag** a launcher to move it when its position is unlocked.
 
-**Compatibility**
+**Compatibility and Feedback**
 
 Supports compatible mod launcher buttons registered through the game’s standard top-left and top-right mod UI hooks. Buttons in other toolbars or the Universal Mod Menu are not collected.
+
+Please test Mod Button Manager with your installed mods and report any issues in the comments. I don’t have every mod installed, so I can’t test all combinations.
+
+If icons disappear or a mod stops working correctly, please include the affected mod’s name, what happened, and the steps to reproduce it. Screenshots and error logs are also helpful.
+
+Your feedback helps me track down problems and improve compatibility. Thank you for helping!

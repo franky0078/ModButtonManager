@@ -1,28 +1,53 @@
 <Publish>
       
-	<ModId Value="" />
+	<ModId Value="163696" />
       
 	<DisplayName Value="Mod Button Manager" />
       
 	<ShortDescription Value="Collect selected mod launcher buttons in a compact dock with one or two rows." />
-    
-	<LongDescription>		
-        Mod Button Manager groups supported mod launcher buttons behind one movable button.
 
-        - Open below, to the right or to the left.
-        - Choose one or two rows.
-        - Select which detected buttons belong in the dock.
-        - Choose one shared launcher or separate launchers for left and right.
-        - Keep button bars open until explicitly collapsed.
-        - Save independent launcher positions and open states.
-        - Enable Hide buttons in options to edit the selection with right-click.
-        - Excluded originals return to the normal UI; selection previews have 40% opacity.
-        - Disable the selection option to remove previews from the manager.
-        - Light-blue launcher style matching existing mod buttons.
-        - Keep original mod button components and click handlers.
-        - English and German interface.
+	<LongDescription>
+	**Mod Button Manager**
 
-    </LongDescription>
+	Keep your interface organized by collecting supported mod buttons in a compact, customizable menu.
+
+	Choose one button for all your mods or separate buttons for the left and right sides of the screen. Decide which buttons belong in the manager and keep the others in their original positions.
+
+	**Features**
+
+	- One shared launcher or separate left and right launchers.
+	- Independent opening directions: below, left or right.
+	- Arrange buttons in one, two or three rows.
+	- Menus stay open when clicking elsewhere.
+	- Move the launcher buttons freely and lock their positions in the options.
+	- Saved launcher positions, opening states and button selection.
+	- Page controls for larger button collections.
+	- English, German, French, Italian and Spanish localization.
+
+	**Button selection**
+
+	Enable **Hide buttons (selection mode)** in the mod options, then right-click buttons inside the manager to exclude them.
+
+	Excluded buttons immediately return to their original positions in the game interface. While selecting, their previews remain visible in the manager at **40% opacity**. Right-click a preview to include the button again.
+
+	Disable selection mode when finished. The previews disappear, leaving only your selected buttons in the manager.
+
+	**Controls**
+
+	- **Left-click** a launcher to open or close its menu.
+	- **Right-click** a launcher to open the settings.
+	- **Drag** a launcher to move it when its position is unlocked.
+
+	**Compatibility and Feedback**
+
+	Supports compatible mod launcher buttons registered through the game's standard top-left and top-right mod UI hooks. Buttons in other toolbars or the Universal Mod Menu are not collected.
+
+	Please test Mod Button Manager with your installed mods and report any issues in the comments. I don't have every mod installed, so I can't test all combinations.
+
+	If icons disappear or a mod stops working correctly, please include the affected mod's name, what happened, and the steps to reproduce it. Screenshots and error logs are also helpful.
+
+	Your feedback helps me track down problems and improve compatibility. Thank you for helping!
+	</LongDescription>
 
 	<Thumbnail Value="Properties/Thumbnail.jpg" />
 
@@ -39,12 +64,17 @@
     <Screenshot Value="Properties/Screenshot10.jpg" />-->
 	
     <Tag Value="Code Mod" />
-    <ModVersion Value="0.9.0" />
+    <ModVersion Value="0.9.1" />
     <GameVersion Value="1.6.*" />
     <ChangeLog>
-	  
-	    Initial release
-    </ChangeLog>
+	Latest Changes:
+		
+	- Added support for three rows of mod buttons.
+	- Fixed scrolling in the button selection list.
+	- Left and right menus now move independently and can overlap without pushing each other away.
+	- Improved compatibility with Network Tools and added support for Traffic Tool Essentials.
+	- Improved button detection to avoid collecting controls from mod windows.
+	</ChangeLog>
     <AccessLevel Value="Public" />
 
 	<!--Optional discussion link.-->
