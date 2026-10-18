@@ -6,7 +6,8 @@
     right: auto !important;
     bottom: auto !important;
     margin: 0 !important;
-    z-index: 1100 !important;
+    /* Keep collected launchers below the game's raised panels and menus. */
+    z-index: 0 !important;
 }
 [data-mbm-hidden="true"], [data-mbm-hidden="true"] * {
     visibility: hidden !important;
@@ -17,7 +18,9 @@
 .mbm-ui { pointer-events: none; font-size: 14rem; color: #edf6ff; }
 .mbm-ui, .mbm-ui *, .mbm-editor, .mbm-editor * { box-sizing: border-box; }
 .mbm-ui button, .mbm-ui input, .mbm-editor-body button { font: inherit; }
-.mbm-launcher, .mbm-controls, .mbm-editor { position: fixed; pointer-events: auto; z-index: 1200; }
+.mbm-launcher, .mbm-controls, .mbm-editor { position: fixed; pointer-events: auto; }
+.mbm-launcher, .mbm-controls { z-index: 0; }
+.mbm-editor { z-index: 1200; }
 .mbm-ui .mbm-controls button, .mbm-editor .mbm-editor-body button {
     color: #edf6ff; background: #263c50; border: 1rem solid #52718a;
     border-radius: 4rem; cursor: pointer;
