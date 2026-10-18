@@ -3,7 +3,7 @@
 <p align="center">
   <img src="ModButtonManager/Properties/Thumbnail.jpg"
        alt="ModButtonManager"
-       width="600">
+       width="300">
 </p>
 
 Keep your interface organized by collecting supported mod buttons in a compact, customizable menu.
