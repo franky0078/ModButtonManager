@@ -64,6 +64,8 @@ export function buttonSignature(button, scope) {
 
 function visible(element) {
     if (!attached(element)) return false;
+    // Our own visibility:hidden is intentional for a closed dock. Do not
+    // confuse it with the source mod removing/hiding its launcher.
     const managed = nearest(element, `[${MANAGED}="true"]`);
     let belowManaged = !!managed;
     for (let current = element; current; current = current.parentElement) {
@@ -77,12 +79,14 @@ function visible(element) {
 }
 
 function carrierFor(button) {
-
+    // React owns the parent: it may also host a tool window, even when that
+    // window is currently closed. Never hide or reposition that shared owner.
     return button;
 }
 
 function inHookRange(element, scope) {
-
+    // The native parent may also contain vanilla controls. Only collect nodes
+    // between this hook's markers, never every button in that parent.
     let child = element;
     while (child && child.parentElement !== scope) child = child.parentElement;
     if (!child) return false;
@@ -106,6 +110,7 @@ function trafficToolLaunchers(scope) {
 
 function eligible(button, scope, launcherRoot = null) {
     if (nearest(button, "[data-mbm-ui], [role=dialog], [role=menu], [role=listbox]")) return false;
+    // A nested role=button belongs to the outer control, not a second launcher.
     if (nearest(button.parentElement, "button, [role=button]")) return false;
     if (!visible(button)) return false;
     const rect = button.getBoundingClientRect();
@@ -113,9 +118,6 @@ function eligible(button, scope, launcherRoot = null) {
     // GameTopLeft is also used for windows. Do not grab their action buttons.
     for (let parent = button.parentElement; parent && parent !== scope && parent !== launcherRoot; parent = parent.parentElement) {
         const bounds = parent.getBoundingClientRect();
-        // Narrow vertical tool panels (for example Network Tools) are not
-        // launchers either. Their controls must remain in the source panel.
-        // Prefer leaving an ambiguous toolbar untouched to stealing its tools.
         if (bounds.height > 112 ||
             parent.querySelector("input, select, textarea, [role=slider]")) return false;
     }
@@ -182,7 +184,10 @@ export function calculateLayout(anchor, count, direction, requestedRows, viewpor
     const height = Math.min(rows, Math.max(1, count)) * cell;
     let left = resolvedDirection === 1 ? anchor.right + gap :
         resolvedDirection === 2 ? anchor.left - gap - width : anchor.left;
-    let top = resolvedDirection === 0 ? anchor.bottom + gap : anchor.top;
+    let top = resolvedDirection === 3 ? anchor.top - gap - height :
+        resolvedDirection === 0 ? anchor.bottom + gap : anchor.top;
+    if (resolvedDirection === 3 && top < margin && anchor.bottom + gap + height <= viewport.height - margin)
+        top = anchor.bottom + gap;
     if (top + height > viewport.height - margin && resolvedDirection === 0)
         top = anchor.top - gap - height;
     left = Math.max(margin, Math.min(left, viewport.width - width - margin));
@@ -215,7 +220,6 @@ export class DockController {
             if (!this.config.selecting || !this.open) return;
             let item = this.renderedItems.find(item => item.supported && contains(item.carrier, event.target) &&
                 item.carrier.getAttribute(MANAGED) === "true" && item.carrier.getAttribute(HIDDEN) !== "true");
-
             const tail = event.type !== "mousedown" && (event.button === 2 || event.type === "contextmenu");
             if (!item && tail && this.selectionGesture && Date.now() - this.selectionGesture.time < 1000 &&
                 contains(this.selectionGesture.carrier, event.target))
@@ -224,7 +228,6 @@ export class DockController {
             event.preventDefault();
             event.stopPropagation();
             event.stopImmediatePropagation?.();
-
             const rightDown = event.type === "mousedown" && (event.button === 2 || event.which === 3);
             const duplicateMenu = event.type === "contextmenu" && this.lastRightDown?.id === item.id &&
                 Date.now() - this.lastRightDown.time < 1000;

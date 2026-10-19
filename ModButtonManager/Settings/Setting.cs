@@ -4,7 +4,7 @@ using Game.Settings;
 
 namespace ModButtonManager.Settings
 {
-    public enum DockDirection { Below, Right, Left }
+    public enum DockDirection { Below, Right, Left, Above }
     public enum ButtonGrouping { Combined, Separate }
 
     [FileLocation(nameof(ModButtonManager))]
@@ -41,11 +41,14 @@ namespace ModButtonManager.Settings
         [SettingsUISection(GeneralTab, LayoutGroup)]
         public bool EditButtonVisibility { get; set; }
 
+        [SettingsUISection(GeneralTab, LayoutGroup)]
+        public bool ShowButtonCount { get; set; }
+
         // Legacy switch is retained only for saved-settings compatibility.
         [SettingsUIHidden]
         public bool EnableExclusions { get; set; }
 
-        [SettingsUISlider(min = 1, max = 3, step = 1, scalarMultiplier = 1)]
+        [SettingsUISlider(min = 1, max = 10, step = 1, scalarMultiplier = 1)]
         [SettingsUISection(GeneralTab, LayoutGroup)]
         public int Rows { get; set; }
 
@@ -92,6 +95,7 @@ namespace ModButtonManager.Settings
             EnableExclusions = true;
             EditButtonVisibility = false;
             Rows = 1;
+            ShowButtonCount = true;
             IncludeTopLeft = true;
             PositionX = 840;
             PositionY = 85;

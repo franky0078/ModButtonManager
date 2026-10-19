@@ -52,7 +52,7 @@ namespace ModButtonManager.Localization
             { "Group mod buttons", "Regrouper les boutons de mods" },
             { "Collect selected top-left and top-right mod buttons. Disable to restore their original positions.", "Regroupe les boutons de mods sélectionnés en haut à gauche et à droite. Désactivez cette option pour rétablir leurs positions initiales." },
             { "Combined launcher opening direction", "Direction d’ouverture du bouton commun" },
-            { "Open below, to the right or to the left of the dock button. Falls back below if there is no space beside it.", "Ouvre la barre en dessous, à droite ou à gauche du bouton. Si l’espace latéral est insuffisant, elle s’ouvre en dessous." },
+            { "Open below, above, to the right or to the left of the dock button. Falls back to available screen space when needed.", "Ouvre le menu en dessous, au-dessus, à droite ou à gauche du bouton de lancement. Utilise l’espace disponible à l’écran si nécessaire." },
             { "Left launcher opening direction", "Direction d’ouverture à gauche" },
             { "Opening direction of the left launcher in separate mode.", "Direction d’ouverture du bouton de regroupement gauche en mode séparé." },
             { "Right launcher opening direction", "Direction d’ouverture à droite" },
@@ -60,10 +60,13 @@ namespace ModButtonManager.Localization
             { "Prevent dragging all launcher buttons. Opening and closing remains available.", "Empêche le déplacement de tous les boutons de regroupement. Ils peuvent toujours être ouverts et fermés." },
             { "Enable to right-click buttons in the manager. Excluded originals return to the game UI; 40% opacity previews remain in the manager. Disable to hide previews and finish selection.", "Activez cette option pour sélectionner les boutons par clic droit dans le gestionnaire. Les originaux exclus reviennent dans l’interface du jeu ; leurs aperçus à 40 % d’opacité restent dans le gestionnaire. Désactivez cette option pour retirer les aperçus et terminer." },
             { "Use one button for all mod launchers, or separate buttons for left and right. Each position is saved separately.", "Utilise un bouton commun pour tous les boutons de mods ou des boutons séparés à gauche et à droite. Chaque position est enregistrée séparément." },
-            { "Arrange collected buttons in one, two or three rows. Large collections use pages.", "Dispose les boutons regroupés sur une, deux ou trois rangées. Les grandes collections sont réparties sur plusieurs pages." },
+            { "Arrange collected buttons in 1 to 10 rows. Large collections use pages.", "Dispose les boutons regroupés sur 1 à 10 rangées. Les grandes collections sont réparties sur plusieurs pages." },
             { "Also collect top-left mod buttons", "Regrouper aussi les boutons de mods en haut à gauche" },
             { "Optional. Only small launcher buttons in the shared mod UI hooks are collected; large panels are excluded.", "Facultatif. Seuls les petits boutons des points d’intégration communs sont regroupés ; les grandes fenêtres sont exclues." },
             { "Restore the position, layout and button selection. Does not change other mods.", "Rétablit les positions, la disposition et la sélection des boutons. Ne modifie pas les autres mods." },
+            { "Show button count", "Afficher le nombre de boutons" },
+            { "Show the number of collected mod buttons on the launcher buttons.", "Affiche le nombre de boutons de mods regroupés sur les boutons de lancement." },
+            { "Above", "Au-dessus" },
         };
     }
 }

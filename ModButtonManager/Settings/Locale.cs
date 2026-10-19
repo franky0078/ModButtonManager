@@ -24,7 +24,7 @@ namespace ModButtonManager.Settings
             Option(entries, nameof(Setting.EnableDock), "Group mod buttons",
                 "Collect selected top-left and top-right mod buttons. Disable to restore their original positions.");
             Option(entries, nameof(Setting.Direction), "Combined launcher opening direction",
-                "Open below, to the right or to the left of the dock button. Falls back below if there is no space beside it.");
+                "Open below, above, to the right or to the left of the dock button. Falls back to available screen space when needed.");
             Option(entries, nameof(Setting.LeftDirection), "Left launcher opening direction",
                 "Opening direction of the left launcher in separate mode.");
             Option(entries, nameof(Setting.RightDirection), "Right launcher opening direction",
@@ -35,8 +35,10 @@ namespace ModButtonManager.Settings
                 "Enable to right-click buttons in the manager. Excluded originals return to the game UI; 40% opacity previews remain in the manager. Disable to hide previews and finish selection.");
             Option(entries, nameof(Setting.Grouping), "Launcher buttons",
                 "Use one button for all mod launchers, or separate buttons for left and right. Each position is saved separately.");
+            Option(entries, nameof(Setting.ShowButtonCount), "Show button count",
+                "Show the number of collected mod buttons on the launcher buttons.");
             Option(entries, nameof(Setting.Rows), "Rows",
-                "Arrange collected buttons in one, two or three rows. Large collections use pages.");
+                "Arrange collected buttons in 1 to 10 rows. Large collections use pages.");
             Option(entries, nameof(Setting.IncludeTopLeft), "Also collect top-left mod buttons",
                 "Optional. Only small launcher buttons in the shared mod UI hooks are collected; large panels are excluded.");
             Option(entries, nameof(Setting.ResetDock), "Reset dock",
@@ -44,6 +46,7 @@ namespace ModButtonManager.Settings
             entries[m_Setting.GetEnumValueLocaleID(DockDirection.Below)] = Text("Below");
             entries[m_Setting.GetEnumValueLocaleID(DockDirection.Right)] = Text("Right");
             entries[m_Setting.GetEnumValueLocaleID(DockDirection.Left)] = Text("Left");
+            entries[m_Setting.GetEnumValueLocaleID(DockDirection.Above)] = Text("Above");
             entries[m_Setting.GetEnumValueLocaleID(ButtonGrouping.Combined)] = Text("One button for all");
             entries[m_Setting.GetEnumValueLocaleID(ButtonGrouping.Separate)] = Text("Separate left and right buttons");
             UI(entries, "Title", "Mod Button Manager");
@@ -63,9 +66,11 @@ namespace ModButtonManager.Settings
             UI(entries, "EditVisibility", "Hide buttons (selection mode)");
             UI(entries, "Direction", "Opening direction");
             UI(entries, "Below", "Below");
+            UI(entries, "Above", "Above");
             UI(entries, "Right", "Right");
             UI(entries, "Left", "Left");
             UI(entries, "Rows", "Rows");
+            UI(entries, "ShowButtonCount", "Show button count");
             UI(entries, "TopLeft", "Also include top left");
             UI(entries, "Selection", "Buttons in the dock");
             UI(entries, "SelectionHint", "Enable Hide buttons to edit this list or right-click the icons. Excluded buttons remain in the normal game UI. Disable to remove their 40% opacity previews from the manager.");

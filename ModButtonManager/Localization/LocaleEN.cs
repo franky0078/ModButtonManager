@@ -52,7 +52,7 @@ namespace ModButtonManager.Localization
             { "Group mod buttons", "Group mod buttons" },
             { "Collect selected top-left and top-right mod buttons. Disable to restore their original positions.", "Collect selected top-left and top-right mod buttons. Disable to restore their original positions." },
             { "Combined launcher opening direction", "Combined launcher opening direction" },
-            { "Open below, to the right or to the left of the dock button. Falls back below if there is no space beside it.", "Open below, to the right or to the left of the dock button. Falls back below if there is no space beside it." },
+            { "Open below, above, to the right or to the left of the dock button. Falls back to available screen space when needed.", "Open below, above, to the right or to the left of the dock button. Falls back to available screen space when needed." },
             { "Left launcher opening direction", "Left launcher opening direction" },
             { "Opening direction of the left launcher in separate mode.", "Opening direction of the left launcher in separate mode." },
             { "Right launcher opening direction", "Right launcher opening direction" },
@@ -60,10 +60,13 @@ namespace ModButtonManager.Localization
             { "Prevent dragging all launcher buttons. Opening and closing remains available.", "Prevent dragging all launcher buttons. Opening and closing remains available." },
             { "Enable to right-click buttons in the manager. Excluded originals return to the game UI; 40% opacity previews remain in the manager. Disable to hide previews and finish selection.", "Enable to right-click buttons in the manager. Excluded originals return to the game UI; 40% opacity previews remain in the manager. Disable to hide previews and finish selection." },
             { "Use one button for all mod launchers, or separate buttons for left and right. Each position is saved separately.", "Use one button for all mod launchers, or separate buttons for left and right. Each position is saved separately." },
-            { "Arrange collected buttons in one, two or three rows. Large collections use pages.", "Arrange collected buttons in one, two or three rows. Large collections use pages." },
+            { "Arrange collected buttons in 1 to 10 rows. Large collections use pages.", "Arrange collected buttons in 1 to 10 rows. Large collections use pages." },
             { "Also collect top-left mod buttons", "Also collect top-left mod buttons" },
             { "Optional. Only small launcher buttons in the shared mod UI hooks are collected; large panels are excluded.", "Optional. Only small launcher buttons in the shared mod UI hooks are collected; large panels are excluded." },
             { "Restore the position, layout and button selection. Does not change other mods.", "Restore the position, layout and button selection. Does not change other mods." },
+            { "Show button count", "Show button count" },
+            { "Show the number of collected mod buttons on the launcher buttons.", "Show the number of collected mod buttons on the launcher buttons." },
+            { "Above", "Above" },
         };
     }
 }

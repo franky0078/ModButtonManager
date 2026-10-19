@@ -19,6 +19,7 @@ const bindings = {
     rightDirection: bindValue(group, "rightDirection", 2),
     locked: bindValue(group, "locked", false),
     editVisibility: bindValue(group, "editVisibility", false),
+    showButtonCount: bindValue(group, "showButtonCount", true),
     rows: bindValue(group, "rows", 1),
     x: bindValue(group, "x", 840),
     y: bindValue(group, "y", 85),
@@ -67,7 +68,8 @@ function Dock({ side, grouping, editing, selecting, setEditor, setSelection }) {
     const directionKey = side === "all" ? "direction" : `${side}Direction`;
     const direction = useValue(bindings[directionKey]);
     const locked = useValue(bindings.locked);
-    const rows = Math.max(1, Math.min(3, useValue(bindings.rows)));
+    const showButtonCount = useValue(bindings.showButtonCount);
+    const rows = Math.max(1, Math.min(10, useValue(bindings.rows)));
     const x = useValue(bindings[side === "all" ? "x" : `${side}X`]);
     const y = useValue(bindings[side === "all" ? "y" : `${side}Y`]);
     const openKey = side === "all" ? "open" : `${side}Open`;
@@ -153,7 +155,7 @@ function Dock({ side, grouping, editing, selecting, setEditor, setSelection }) {
     const changeOpen = value => { setOpen(value); setOption(openKey, value); };
     const check = (key, checked, change) => h(Checkbox, { label: t(key), checked, onChange: change });
     const choose = (key, value, values, optionKey = key.toLowerCase()) => h("div", { className: "mbm-option" },
-        h("span", null, t(key)), h("div", { className: "mbm-choices" }, values.map(item =>
+        h("span", null, t(key)), h("div", { className: key === "Rows" ? "mbm-choices mbm-row-choices" : key === "Direction" ? "mbm-choices mbm-direction-choices" : "mbm-choices" }, values.map(item =>
             h("button", { key: item.value, type: "button", className: value === item.value ? "mbm-selected" : "",
                 "aria-pressed": value === item.value, onClick: () => setOption(optionKey, item.value) }, item.label))));
     const scale = anchor.current ? anchor.current.getBoundingClientRect().width / 40 || 1 : 1;
@@ -196,9 +198,10 @@ function Dock({ side, grouping, editing, selecting, setEditor, setSelection }) {
         }, h("svg", { viewBox: "0 0 32 32", width: 28, height: 28,
             style: { width: "28rem", height: "28rem" }, "aria-hidden": true },
             [4, 13, 22].flatMap(x => [4, 13, 22].map(y => h("rect", { key: `${x}-${y}`, x, y, width: 6, height: 6, rx: 1, fill: "currentColor" })))),
-            h("span", { className: "mbm-badge" }, view.count))),
+            showButtonCount && h("span", { className: "mbm-badge" }, view.count))),
         (open || editing || selecting) && view.pages > 1 && h("div", { className: "mbm-controls",
-            style: { left: Math.max(0, Math.min(left, viewport.width - 100 * scale)), top: Math.max(0, top - 30 * scale) } },
+            style: { left: direction === 3 ? Math.max(0, left + 148 * scale <= viewport.width ? left + 48 * scale : left - 108 * scale) : Math.max(0, Math.min(left, viewport.width - 100 * scale)),
+                top: direction === 3 ? Math.min(viewport.height - 25 * scale, top) : Math.max(0, top - 30 * scale) } },
                 h("button", { type: "button", disabled: view.page === 0, "aria-label": t("Previous"),
                     onClick: () => controller.current?.changePage(-1) },
                     h("svg", { viewBox: "0 0 16 16", width: 16, height: 16 }, h("path", { d: "M10 3L5 8l5 5", fill: "none", stroke: "currentColor", strokeWidth: 2 }))),
@@ -214,10 +217,11 @@ function Dock({ side, grouping, editing, selecting, setEditor, setSelection }) {
                 onWheel: event => event.stopPropagation() },
                 check("Enabled", enabled, value => setOption("enabled", value)),
                 check("Locked", locked, value => setOption("locked", value)),
+                check("ShowButtonCount", showButtonCount, value => setOption("showButtonCount", value)),
                 check("EditVisibility", selecting, value => setSelection(value)),
                 choose("Grouping", grouping, [{ value: 0, label: t("Combined") }, { value: 1, label: t("Separate") }]),
-                choose("Direction", direction, [0, 1, 2].map((value, index) => ({ value, label: t(["Below", "Right", "Left"][index]) })), directionKey),
-                choose("Rows", rows, [1, 2, 3].map(value => ({ value, label: String(value) }))),
+                choose("Direction", direction, [0, 1, 2, 3].map((value, index) => ({ value, label: t(["Below", "Right", "Left", "Above"][index]) })), directionKey),
+                choose("Rows", rows, Array.from({ length: 10 }, (_, index) => index + 1).map(value => ({ value, label: String(value) }))),
                 h("button", { type: "button", className: "mbm-reset", onClick: () => {
                     setOption("enabled", true); changeOpen(true); setEditor(null); setSelection(!selecting);
                 } }, t(selecting ? "FinishSelection" : "SelectButtons")),

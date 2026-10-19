@@ -4,7 +4,7 @@
       
 	<DisplayName Value="Mod Button Manager" />
       
-	<ShortDescription Value="Collect selected mod launcher buttons in a compact dock with one, two or three rows." />
+	<ShortDescription Value="Collect selected mod launcher buttons in a compact dock with 10 rows." />
 
 	<LongDescription>
 	**Mod Button Manager**
@@ -17,7 +17,7 @@
 
 	- One shared launcher or separate left and right launchers.
 	- Independent opening directions: below, left or right.
-	- Arrange buttons in one, two or three rows.
+	- Arrange buttons in 10 rows.
 	- Menus stay open when clicking elsewhere.
 	- Move the launcher buttons freely and lock their positions in the options.
 	- Saved launcher positions, opening states and button selection.
@@ -57,23 +57,22 @@
     <Screenshot Value="Properties/Screenshot03.jpg" />
     <Screenshot Value="Properties/Screenshot04.jpg" />
     <Screenshot Value="Properties/Screenshot05.jpg" />
-	<!--<Screenshot Value="Properties/Screenshot06.jpg" />
-    <Screenshot Value="Properties/Screenshot07.jpg" />
+	<Screenshot Value="Properties/Screenshot06.jpg" />
+	<!--<Screenshot Value="Properties/Screenshot07.jpg" />
     <Screenshot Value="Properties/Screenshot08.jpg" />
     <Screenshot Value="Properties/Screenshot09.jpg" />
     <Screenshot Value="Properties/Screenshot10.jpg" />-->
 	
     <Tag Value="Code Mod" />
-    <ModVersion Value="0.9.1" />
+    <ModVersion Value="0.9.2" />
     <GameVersion Value="1.6.*" />
     <ChangeLog>
-	Latest Changes:
-		
-	- Added support for three rows of mod buttons.
-	- Fixed scrolling in the button selection list.
-	- Left and right menus now move independently and can overlap without pushing each other away.
-	- Improved compatibility with Network Tools and added support for Traffic Tool Essentials.
-	- Improved button detection to avoid collecting controls from mod windows.
+		Latest Changes:
+
+		- Increased the maximum number of button rows from 3 to 10.
+		- Added an option to show or hide the icon counter on launcher buttons.
+		- Added an upward opening direction for launchers.
+		- Fixed CSS compatibility issues.
 	</ChangeLog>
     <AccessLevel Value="Public" />
 

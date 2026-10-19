@@ -14,7 +14,7 @@ Choose one button for all your mods or separate buttons for the left and right s
 
 - One shared launcher or separate left and right launchers.
 - Independent opening directions: below, left or right.
-- Arrange buttons in one or two rows.
+- Arrange buttons in 10 rows.
 - Menus stay open when clicking elsewhere.
 - Move the launcher buttons freely and lock their positions in the options.
 - Saved launcher positions, opening states and button selection.

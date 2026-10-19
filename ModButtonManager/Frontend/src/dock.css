@@ -18,7 +18,10 @@
 [data-mbm-excluded="true"] { opacity: 0.4 !important; }
 .mbm-ui { pointer-events: none; font-size: 14rem; color: #edf6ff; }
 .mbm-ui, .mbm-ui *, .mbm-editor, .mbm-editor * { box-sizing: border-box; }
-.mbm-ui button, .mbm-ui input, .mbm-editor-body button { font: inherit; }
+.mbm-ui button, .mbm-ui input, .mbm-editor-body button {
+    font-family: inherit; font-size: 14rem; font-style: inherit;
+    font-weight: inherit; line-height: inherit;
+}
 .mbm-launcher, .mbm-controls, .mbm-editor { position: fixed; pointer-events: auto; }
 .mbm-launcher, .mbm-controls { z-index: -1; }
 .mbm-editor { z-index: 1200; }
@@ -27,9 +30,9 @@
     border-radius: 4rem; cursor: pointer;
 }
 .mbm-ui .mbm-controls button:hover, .mbm-editor .mbm-editor-body button:hover { background: #3e607b; }
-.mbm-ui button:focus-visible, .mbm-editor button:focus-visible { outline: 2rem solid #67d5ff; }
+.mbm-ui button:focus, .mbm-editor button:focus { outline: 2rem solid #67d5ff; }
 .mbm-ui button.mbm-selected, .mbm-editor button.mbm-selected { background: #28799e; border-color: #75dcff; }
-.mbm-ui button:disabled, .mbm-editor button:disabled { opacity: 0.4; cursor: default; }
+.mbm-ui button[disabled], .mbm-editor button[disabled] { opacity: 0.4; cursor: default; }
 .mbm-ui button.mbm-launcher {
     width: 40rem; height: 40rem; padding: 5rem; display: flex;
     justify-content: center; align-items: center; color: #fff;
@@ -69,6 +72,10 @@
 .mbm-check-text { min-width: 0; }
 .mbm-option { display: flex; align-items: center; justify-content: space-between; margin: 9rem 0; }
 .mbm-choices { display: flex; }
+.mbm-row-choices { flex-wrap: wrap; justify-content: flex-end; width: 180rem; flex-shrink: 0; }
+.mbm-row-choices button { margin-bottom: 4rem; }
+.mbm-direction-choices { flex-wrap: wrap; justify-content: flex-end; max-width: 238rem; }
+.mbm-direction-choices button { margin-bottom: 4rem; }
 .mbm-choices button { padding: 5rem 8rem; min-width: 30rem; margin-left: 4rem; font-size: 12rem; }
 .mbm-selection-title { margin-top: 12rem; border-top: 1rem solid #52718a; padding-top: 10rem; font-weight: bold; }
 .mbm-hint { font-size: 12rem; line-height: 17rem; color: #bdcddd; margin: 6rem 0 9rem; }

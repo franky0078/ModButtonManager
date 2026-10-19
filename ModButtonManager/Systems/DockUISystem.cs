@@ -25,6 +25,7 @@ namespace ModButtonManager.Systems
             AddUpdateBinding(new GetterValueBinding<int>(Group, "rightDirection", () => (int)(Mod.Settings?.RightDirection ?? DockDirection.Left)));
             AddUpdateBinding(new GetterValueBinding<bool>(Group, "locked", () => Mod.Settings?.LockPositions ?? false));
             AddUpdateBinding(new GetterValueBinding<bool>(Group, "editVisibility", () => Mod.Settings?.EditButtonVisibility ?? false));
+            AddUpdateBinding(new GetterValueBinding<bool>(Group, "showButtonCount", () => Mod.Settings?.ShowButtonCount ?? true));
             AddUpdateBinding(new GetterValueBinding<int>(Group, "rows", () => Mod.Settings?.Rows ?? 1));
             AddUpdateBinding(new GetterValueBinding<int>(Group, "x", () => Mod.Settings?.PositionX ?? 840));
             AddUpdateBinding(new GetterValueBinding<int>(Group, "y", () => Mod.Settings?.PositionY ?? 85));
@@ -61,15 +62,16 @@ namespace ModButtonManager.Systems
             else if (key == "rightOpen" && bool.TryParse(value, out bool rightOpen)) settings.RightOpen = rightOpen;
             else if (key == "grouping" && int.TryParse(value, out int grouping) && grouping >= 0 && grouping <= 1)
                 settings.Grouping = (ButtonGrouping)grouping;
-            else if (key == "direction" && int.TryParse(value, out int direction) && direction >= 0 && direction <= 2)
+            else if (key == "direction" && int.TryParse(value, out int direction) && direction >= 0 && direction <= 3)
                 settings.Direction = (DockDirection)direction;
-            else if (key == "leftDirection" && int.TryParse(value, out int leftDirection) && leftDirection >= 0 && leftDirection <= 2)
+            else if (key == "leftDirection" && int.TryParse(value, out int leftDirection) && leftDirection >= 0 && leftDirection <= 3)
                 settings.LeftDirection = (DockDirection)leftDirection;
-            else if (key == "rightDirection" && int.TryParse(value, out int rightDirection) && rightDirection >= 0 && rightDirection <= 2)
+            else if (key == "rightDirection" && int.TryParse(value, out int rightDirection) && rightDirection >= 0 && rightDirection <= 3)
                 settings.RightDirection = (DockDirection)rightDirection;
             else if (key == "locked" && bool.TryParse(value, out bool locked)) settings.LockPositions = locked;
             else if (key == "editVisibility" && bool.TryParse(value, out bool editVisibility)) settings.EditButtonVisibility = editVisibility;
-            else if (key == "rows" && int.TryParse(value, out int rows) && rows >= 1 && rows <= 3) settings.Rows = rows;
+            else if (key == "showButtonCount" && bool.TryParse(value, out bool showButtonCount)) settings.ShowButtonCount = showButtonCount;
+            else if (key == "rows" && int.TryParse(value, out int rows) && rows >= 1 && rows <= 10) settings.Rows = rows;
             else return;
             settings.ApplyAndSave();
         }
