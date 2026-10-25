@@ -19,8 +19,9 @@
 .mbm-ui { pointer-events: none; font-size: 14rem; color: #edf6ff; }
 .mbm-ui, .mbm-ui *, .mbm-editor, .mbm-editor * { box-sizing: border-box; }
 .mbm-ui button, .mbm-ui input, .mbm-editor-body button {
-    font-family: inherit; font-size: 14rem; font-style: inherit;
-    font-weight: inherit; line-height: inherit;
+    /* Keep the game's native control font; Cohtml can resolve explicit
+       font inheritance to a fallback with missing localized glyphs. */
+    font-size: 14rem;
 }
 .mbm-launcher, .mbm-controls, .mbm-editor { position: fixed; pointer-events: auto; }
 .mbm-launcher, .mbm-controls { z-index: -1; }
@@ -60,6 +61,7 @@
     padding: 3rem 0; border: 0; border-radius: 3rem;
     background: transparent; text-align: left; color: #fff;
 }
+.mbm-editor .mbm-editor-body button.mbm-check { font-size: 13rem; }
 .mbm-editor button.mbm-check:hover { background: rgba(76, 188, 226, 0.16); }
 .mbm-check-box {
     display: flex; justify-content: center; align-items: center;
