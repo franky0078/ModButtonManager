@@ -57,7 +57,7 @@ namespace ModButtonManager.Settings
             UI(entries, "Separate", "Left / right");
             UI(entries, "SelectButtons", "Select buttons");
             UI(entries, "FinishSelection", "Finish selection");
-            UI(entries, "SelectHint", "Selection mode: right-click mod buttons. Excluded originals return to the game UI; manager previews have 40% opacity. Turn off Hide buttons in options to finish. Right-click this launcher for settings.");
+            UI(entries, "SelectHint", "Selection mode: right-click mod buttons. Excluded originals return to the game UI; manager previews have 40% opacity. Turn off Hide buttons in options to finish. Right-click this launcher for settings. Hold the left mouse button and drag icons to reorder them. The order is saved automatically; new mod buttons are added at the end.");
             UI(entries, "Toggle", "Click to open or close · Stays open · Right-click for settings · Drag to move");
             UI(entries, "Settings", "Dock settings");
             UI(entries, "Close", "Close");
@@ -73,7 +73,7 @@ namespace ModButtonManager.Settings
             UI(entries, "ShowButtonCount", "Show button count");
             UI(entries, "TopLeft", "Also include top left");
             UI(entries, "Selection", "Buttons in the dock");
-            UI(entries, "SelectionHint", "Enable Hide buttons to edit this list or right-click the icons. Excluded buttons remain in the normal game UI. Disable to remove their 40% opacity previews from the manager.");
+            UI(entries, "SelectionHint", "Enable Hide buttons to edit this list or right-click the icons. Excluded buttons remain in the normal game UI. Disable to remove their 40% opacity previews from the manager. Hold the left mouse button and drag icons to reorder them. The order is saved automatically; new mod buttons are added at the end.");
             UI(entries, "Empty", "No supported mod buttons found. Their own launcher options must be enabled.");
             UI(entries, "Unavailable", "The shared mod UI hook is unavailable in this game version.");
             UI(entries, "Unsupported", "Cannot safely position this button (transformed parent).");

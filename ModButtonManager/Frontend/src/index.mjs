@@ -30,6 +30,9 @@ const bindings = {
     open: bindValue(group, "open", false),
     leftOpen: bindValue(group, "leftOpen", false),
     rightOpen: bindValue(group, "rightOpen", false),
+    order: bindValue(group, "order", ""),
+    leftOrder: bindValue(group, "leftOrder", ""),
+    rightOrder: bindValue(group, "rightOrder", ""),
     excluded: bindValue(group, "excluded", "")
 };
 let hookAvailable = false;
@@ -74,6 +77,7 @@ function Dock({ side, grouping, editing, selecting, setEditor, setSelection }) {
     const y = useValue(bindings[side === "all" ? "y" : `${side}Y`]);
     const openKey = side === "all" ? "open" : `${side}Open`;
     const savedOpen = useValue(bindings[openKey]);
+    const order = useValue(bindings[side === "all" ? "order" : `${side}Order`]) || "";
     const excluded = useValue(bindings.excluded) || "";
     const anchor = useRef(null);
     const controller = useRef(null);
@@ -87,7 +91,7 @@ function Dock({ side, grouping, editing, selecting, setEditor, setSelection }) {
     const currentPosition = useRef(position);
     currentPosition.current = position;
     const generic = t("Generic");
-    const config = { enabled, direction, rows, topLeft: true, source: side, excluded, selecting };
+    const config = { enabled, direction, rows, topLeft: true, source: side, order, excluded, selecting };
     const currentConfig = useRef(config);
     currentConfig.current = config;
 
@@ -95,13 +99,14 @@ function Dock({ side, grouping, editing, selecting, setEditor, setSelection }) {
     useEffect(() => setOpen(savedOpen), [savedOpen]);
     useLayoutEffect(() => {
         const instance = new DockController(anchor.current, currentConfig.current, setView, generic,
-            (id, include) => trigger(group, "include", id, include));
+            (id, include) => trigger(group, "include", id, include),
+            value => trigger(group, "saveOrder", side, value));
         controller.current = instance;
         return () => { instance.stop(); controller.current = null; };
     }, [generic, side]);
     useLayoutEffect(() => {
         controller.current?.update(config, open || editing || selecting);
-    }, [enabled, direction, rows, excluded, selecting, open, editing, position.x, position.y, viewport, generic, side]);
+    }, [enabled, direction, rows, order, excluded, selecting, open, editing, position.x, position.y, viewport, generic, side]);
 
     useEffect(() => {
         const move = event => {

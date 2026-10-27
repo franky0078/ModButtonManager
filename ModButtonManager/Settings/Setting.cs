@@ -77,6 +77,13 @@ namespace ModButtonManager.Settings
         [SettingsUIHidden]
         public string ExcludedButtons { get; set; }
 
+        [SettingsUIHidden]
+        public string ButtonOrder { get; set; }
+        [SettingsUIHidden]
+        public string LeftButtonOrder { get; set; }
+        [SettingsUIHidden]
+        public string RightButtonOrder { get; set; }
+
         [SettingsUIButton]
         [SettingsUISection(GeneralTab, ResetGroup)]
         public bool ResetDock
@@ -107,6 +114,7 @@ namespace ModButtonManager.Settings
             LeftOpen = false;
             RightOpen = false;
             ExcludedButtons = string.Empty;
+            ButtonOrder = LeftButtonOrder = RightButtonOrder = string.Empty;
         }
     }
 }

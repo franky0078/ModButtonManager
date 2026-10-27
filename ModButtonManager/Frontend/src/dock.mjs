@@ -1,7 +1,7 @@
 
 const MANAGED = "data-mbm-managed";
 const HIDDEN = "data-mbm-hidden";
-const OWNED = [MANAGED, HIDDEN, "data-mbm-highlight", "data-mbm-excluded"];
+const OWNED = [MANAGED, HIDDEN, "data-mbm-highlight", "data-mbm-excluded", "data-mbm-reordering"];
 const VARIABLES = ["--mbm-left", "--mbm-top"];
 
 export function attached(element) {
@@ -195,13 +195,22 @@ export function calculateLayout(anchor, count, direction, requestedRows, viewpor
     return { left, top, width, height, columns, rows, cell, capacity, pages: Math.max(1, Math.ceil(count / capacity)) };
 }
 
+export function parseOrder(value) {
+    return Array.from(new Set((value || "").split("|").filter(id => /^[a-f0-9]{8}-[0-9]{1,4}$/.test(id))));
+}
+
 export class DockController {
-    constructor(anchor, config, onChange, generic, onInclude = () => {}) {
+    constructor(anchor, config, onChange, generic, onInclude = () => {}, onOrder = () => {}) {
         this.anchor = anchor;
         this.config = config;
         this.onChange = onChange;
         this.generic = generic;
         this.onInclude = onInclude;
+        this.onOrder = onOrder;
+        this.order = parseOrder(config.order);
+        this.receivedOrder = config.order || "";
+        this.pendingOrders = [];
+        this.reordering = null;
         this.owned = new Map();
         this.items = [];
         this.renderedItems = [];
@@ -217,6 +226,15 @@ export class DockController {
         this.pendingIncludes = new Map();
         this.settleFrames = 0;
         this.editEvent = event => {
+            if (event.type === "click" && Date.now() < this.suppressReorderClickUntil) {
+                event.preventDefault(); event.stopPropagation(); event.stopImmediatePropagation?.();
+                return;
+            }
+            if (this.reordering && event.type === "mouseup") {
+                event.preventDefault(); event.stopPropagation(); event.stopImmediatePropagation?.();
+                this.finishReorder();
+                return;
+            }
             if (!this.config.selecting || !this.open) return;
             let item = this.renderedItems.find(item => item.supported && contains(item.carrier, event.target) &&
                 item.carrier.getAttribute(MANAGED) === "true" && item.carrier.getAttribute(HIDDEN) !== "true");
@@ -228,6 +246,11 @@ export class DockController {
             event.preventDefault();
             event.stopPropagation();
             event.stopImmediatePropagation?.();
+            if (event.type === "mousedown" && event.button === 0) {
+                this.reordering = item.id;
+                this.startDragPreview(item, event);
+                this.refresh();
+            }
             const rightDown = event.type === "mousedown" && (event.button === 2 || event.which === 3);
             const duplicateMenu = event.type === "contextmenu" && this.lastRightDown?.id === item.id &&
                 Date.now() - this.lastRightDown.time < 1000;
@@ -239,6 +262,27 @@ export class DockController {
                 this.includeButton(item.id, this.config.excluded.split("|").indexOf(item.id) >= 0);
             }
         };
+        this.reorderMove = event => {
+            if (!this.reordering) return;
+            this.moveDragPreview(event);
+            event.preventDefault(); event.stopPropagation(); event.stopImmediatePropagation?.();
+            const target = this.renderedItems.find(item => {
+                if (item.carrier.getAttribute(HIDDEN) === "true") return false;
+                const rect = item.carrier.getBoundingClientRect();
+                return event.clientX >= rect.left && event.clientX <= rect.right &&
+                    event.clientY >= rect.top && event.clientY <= rect.bottom;
+            });
+            if (!target || target.id === this.reordering) return;
+            const from = this.order.indexOf(this.reordering);
+            const to = this.order.indexOf(target.id);
+            if (from < 0 || to < 0) return;
+            this.order.splice(from, 1);
+            this.order.splice(to, 0, this.reordering);
+            this.refresh();
+        };
+        this.reorderBlur = () => this.finishReorder();
+        document.addEventListener("mousemove", this.reorderMove, true);
+        window.addEventListener("blur", this.reorderBlur);
         this.editEvents = ["mousedown", "mouseup", "click", "dblclick", "contextmenu"];
         for (const event of this.editEvents) document.addEventListener(event, this.editEvent, true);
         this.request = () => {
@@ -275,7 +319,60 @@ export class DockController {
         this.onInclude(id, include);
     }
 
+    saveOrder() {
+        const value = this.order.join("|");
+        if (value === (this.pendingOrders.length ? this.pendingOrders[this.pendingOrders.length - 1] : this.receivedOrder)) return;
+        this.pendingOrders.push(value);
+        this.onOrder(value);
+    }
+
+    startDragPreview(item, event) {
+        this.removeDragPreview();
+        // Reuse the styled, inert icon copy used for excluded buttons, but
+        // keep it out of the selection-preview cache and the dock layout.
+        const preview = this.preview(item, new Map());
+        const rect = item.carrier.getBoundingClientRect();
+        preview.carrier.className = "mbm-drag-preview";
+        preview.carrier.setAttribute("aria-hidden", "true");
+        this.dragPreview = { ...preview,
+            offsetX: event.clientX - rect.left, offsetY: event.clientY - rect.top };
+        this.moveDragPreview(event);
+    }
+
+    moveDragPreview(event) {
+        const preview = this.dragPreview;
+        if (!preview) return;
+        const context = positioningContext(preview.carrier) || preview.context;
+        preview.carrier.style.left = `${(event.clientX - preview.offsetX - context.left) / context.scaleX}px`;
+        preview.carrier.style.top = `${(event.clientY - preview.offsetY - context.top) / context.scaleY}px`;
+    }
+
+    removeDragPreview() {
+        this.dragPreview?.carrier.parentNode?.removeChild(this.dragPreview.carrier);
+        this.dragPreview = null;
+    }
+
+    finishReorder() {
+        if (!this.reordering) return;
+        this.reordering = null;
+        this.removeDragPreview();
+        this.suppressReorderClickUntil = Date.now() + 300;
+        this.saveOrder();
+        this.refresh();
+    }
+
     update(config, open) {
+        if (!config.selecting || !config.enabled || !open) this.finishReorder();
+        const incoming = config.order || "";
+        if (incoming !== this.receivedOrder) {
+            this.receivedOrder = incoming;
+            const acknowledged = this.pendingOrders.indexOf(incoming);
+            if (acknowledged >= 0) this.pendingOrders.splice(0, acknowledged + 1);
+            else {
+                this.pendingOrders = [];
+                this.order = parseOrder(incoming);
+            }
+        }
         const excluded = new Set(config.excluded.split("|").filter(Boolean));
         for (const [id, include] of this.pendingIncludes) {
             if (excluded.has(id) === !include) this.pendingIncludes.delete(id);
@@ -313,9 +410,9 @@ export class DockController {
         }
     }
 
-    preview(item) {
+    preview(item, cache = this.previews) {
         const markup = item.button.outerHTML;
-        let preview = this.previews.get(item.id);
+        let preview = cache.get(item.id);
         if (!preview) {
             const carrier = document.createElement("div");
             carrier.setAttribute("data-mbm-ui", "true");
@@ -326,7 +423,7 @@ export class DockController {
             carrier.style.justifyContent = "center";
             (nearest(this.anchor, "[data-mbm-ui]") || this.anchor.parentElement).appendChild(carrier);
             preview = { carrier, markup: null };
-            this.previews.set(item.id, preview);
+            cache.set(item.id, preview);
         }
         const rect = item.button.getBoundingClientRect();
         const context = positioningContext(preview.carrier) || { left: 0, top: 0, scaleX: 1, scaleY: 1 };
@@ -426,6 +523,15 @@ export class DockController {
                     context, name: nameFor(button, this.generic, items.length), supported: !!context });
             }
         }
+        // Keep missing/excluded IDs. Newly discovered buttons always append.
+        const known = new Set(this.order);
+        for (const item of items) if (!known.has(item.id)) {
+            known.add(item.id);
+            this.order.push(item.id);
+        }
+        const rank = new Map(this.order.map((id, index) => [id, index]));
+        items.sort((a, b) => rank.get(a.id) - rank.get(b.id));
+        if (!this.reordering) this.saveOrder();
         this.items = items;
         const excluded = new Set(this.config.excluded.split("|").filter(Boolean));
         const included = this.config.enabled ? items.filter(item => item.supported && !excluded.has(item.id)) : [];
@@ -464,6 +570,7 @@ export class DockController {
             this.own(item.carrier);
             item.carrier.setAttribute(MANAGED, "true");
             item.carrier.setAttribute(HIDDEN, String(!this.open || local < 0 || local >= layout.capacity));
+            item.carrier.setAttribute("data-mbm-reordering", String(item.id === this.reordering));
             item.carrier.setAttribute("data-mbm-excluded", String(!!this.config.selecting && excluded.has(item.id)));
             const left = layout.left + (Math.max(0, local) % layout.columns) * cell + (cell - rect.width) / 2;
             const top = layout.top + Math.floor(Math.max(0, local) / layout.columns) * cell + (cell - rect.height) / 2;
@@ -490,6 +597,9 @@ export class DockController {
     }
 
     stop() {
+        this.finishReorder();
+        document.removeEventListener("mousemove", this.reorderMove, true);
+        window.removeEventListener("blur", this.reorderBlur);
         this.stopped = true;
         clearInterval(this.timer);
         cancelAnimationFrame(this.frame);

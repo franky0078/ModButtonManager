@@ -87,3 +87,21 @@
 .mbm-item .mbm-check-text { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .mbm-unsupported { opacity: 0.5; }
 .mbm-reset { width: 100%; margin-top: 12rem; padding: 7rem; }
+
+[data-mbm-reordering="true"] {
+    outline: 2rem dashed #78c8ff !important;
+    opacity: 0.25 !important;
+    cursor: grabbing;
+}
+
+/* The copy follows the pointer; the dimmed original marks the drop slot. */
+.mbm-drag-preview {
+    position: fixed !important;
+    z-index: 2000 !important;
+    pointer-events: none !important;
+    opacity: 0.95;
+    outline: 2rem solid #78c8ff;
+    border-radius: 5rem;
+    box-shadow: 0 5rem 16rem rgba(0, 0, 0, 0.65);
+}
+.mbm-drag-preview * { pointer-events: none !important; }

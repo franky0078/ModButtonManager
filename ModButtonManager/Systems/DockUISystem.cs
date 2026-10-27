@@ -37,6 +37,10 @@ namespace ModButtonManager.Systems
             AddUpdateBinding(new GetterValueBinding<bool>(Group, "leftOpen", () => Mod.Settings?.LeftOpen ?? false));
             AddUpdateBinding(new GetterValueBinding<bool>(Group, "rightOpen", () => Mod.Settings?.RightOpen ?? false));
             AddUpdateBinding(new GetterValueBinding<string>(Group, "excluded", () => Mod.Settings?.ExcludedButtons ?? string.Empty));
+            AddUpdateBinding(new GetterValueBinding<string>(Group, "order", () => Mod.Settings?.ButtonOrder ?? string.Empty));
+            AddUpdateBinding(new GetterValueBinding<string>(Group, "leftOrder", () => Mod.Settings?.LeftButtonOrder ?? string.Empty));
+            AddUpdateBinding(new GetterValueBinding<string>(Group, "rightOrder", () => Mod.Settings?.RightButtonOrder ?? string.Empty));
+            AddBinding(new TriggerBinding<string, string>(Group, "saveOrder", SaveOrder));
             AddBinding(new TriggerBinding<string, string>(Group, "setOption", SetOption));
             AddBinding(new TriggerBinding<int, int>(Group, "position", SavePosition));
             AddBinding(new TriggerBinding<int, int>(Group, "positionLeft", (x, y) => SaveSidePosition(true, x, y)));
@@ -98,6 +102,18 @@ namespace ModButtonManager.Systems
                 Mod.Settings.RightPositionY = Clamp(y, 0, 1000);
             }
             Mod.Settings.ApplyAndSave();
+        }
+
+        private static void SaveOrder(string side, string value)
+        {
+            var settings = Mod.Settings;
+            if (settings == null || value == null || value.Length > 262144) return;
+            var order = string.Join("|", value.Split('|').Where(id => ButtonKey.IsMatch(id)).Distinct(StringComparer.Ordinal));
+            if (side == "all") settings.ButtonOrder = order;
+            else if (side == "left") settings.LeftButtonOrder = order;
+            else if (side == "right") settings.RightButtonOrder = order;
+            else return;
+            settings.ApplyAndSave();
         }
 
         private static void IncludeButton(string key, bool include)
