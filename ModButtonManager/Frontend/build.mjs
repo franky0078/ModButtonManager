@@ -29,7 +29,7 @@ for (const m of localeSource.matchAll(/UI\(entries, "[^"]+", "([^"]*)"\)/g)) req
 for (const m of localeSource.matchAll(/Option\(entries, nameof\(Setting\.\w+\),\s*"([^"]*)",\s*"([^"]*)"\)/g)) {
     required.add(m[1]); required.add(m[2]);
 }
-for (const code of ["EN", "DE", "FR", "IT", "ES"]) {
+for (const code of ["EN", "DE", "FR", "IT", "ES", "JA", "KO", "PL", "PTBR", "RU", "ZHHANS", "ZHHANT"]) {
     const source = fs.readFileSync(path.join(project, `Localization/Locale${code}.cs`), "utf8");
     const texts = new Map([...source.matchAll(/\{\s*("(?:\\.|[^"\\])*")\s*,\s*("(?:\\.|[^"\\])*")\s*\}/g)]
         .map(m => [JSON.parse(m[1]), JSON.parse(m[2])]));

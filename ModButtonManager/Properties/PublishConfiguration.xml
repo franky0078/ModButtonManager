@@ -23,7 +23,7 @@
 		- Saved launcher positions, opening states and button selection.
 		- Page controls for larger button collections.
 		- Drag and Drop sorting in selection mode. Hold the left mouse button and drag an icon to change its position.
-		- English, German, French, Italian and Spanish localization.
+		- Language support for all 12 in-game languages: English, German, French, Spanish (Spain), Italian, Japanese, Korean, Polish, Portuguese (Brazil), Russian, Simplified Chinese and Traditional Chinese
 
 		**Button selection**
 
@@ -65,12 +65,12 @@
     <Screenshot Value="Properties/Screenshot10.jpg" />-->
 	
     <Tag Value="Code Mod" />
-    <ModVersion Value="0.9.4" />
+    <ModVersion Value="1.0.0" />
     <GameVersion Value="1.6.*" />
     <ChangeLog>
 		Latest Changes:
 
-		- added drag-and-drop sorting in selection mode.
+		- added Language support for all 12 in-game languages
 	</ChangeLog>
     <AccessLevel Value="Public" />
 
