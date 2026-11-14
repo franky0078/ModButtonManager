@@ -3,6 +3,8 @@ const MANAGED = "data-mbm-managed";
 const HIDDEN = "data-mbm-hidden";
 const OWNED = [MANAGED, HIDDEN, "data-mbm-highlight", "data-mbm-excluded", "data-mbm-reordering"];
 const VARIABLES = ["--mbm-left", "--mbm-top"];
+const FORWARDED_EVENTS = ["mousedown", "mouseup", "click", "dblclick", "contextmenu",
+    "mouseover", "mouseout", "mouseenter", "mouseleave"];
 
 export function attached(element) {
     if (!element) return false;
@@ -434,9 +436,10 @@ export class DockController {
             const originals = [item.button, ...Array.from(item.button.querySelectorAll("*"))];
             const copies = [copy, ...Array.from(copy.querySelectorAll("*"))];
             const ids = new Map();
+            const prefix = cache === this.previews ? "mbm-preview" : "mbm-drag";
             copies.forEach(node => {
                 const id = node.getAttribute("id");
-                if (id) ids.set(id, `mbm-preview-${item.id}-${id}`);
+                if (id) ids.set(id, `${prefix}-${item.id}-${id}`);
             });
             copies.forEach((node, index) => {
                 for (const attribute of Array.from(node.attributes)) {
@@ -459,7 +462,7 @@ export class DockController {
                     "border-top-style", "border-right-style", "border-bottom-style", "border-left-style",
                     "border-top-color", "border-right-color", "border-bottom-color", "border-left-color",
                     "border-top-left-radius", "border-top-right-radius", "border-bottom-right-radius", "border-bottom-left-radius",
-                    "display", "align-items", "justify-content", "font-size", "font-family",
+                    "display", "align-items", "justify-content", "font-size", "font-family", "cursor",
                     "fill", "stroke", "mask-image", "mask-size", "mask-position", "mask-repeat"]) {
                     const value = style.getPropertyValue(property);
                     if (value && value !== "auto" && value !== "initial") node.style.setProperty(property, value);
@@ -479,13 +482,59 @@ export class DockController {
             context };
     }
 
+    dockButton(item, excluded) {
+        // Paint next to the launcher while leaving the source in its React tree.
+        const display = this.preview(item);
+        const preview = this.previews.get(item.id);
+        if (!preview.source) {
+            for (const type of FORWARDED_EVENTS) {
+                display.carrier.addEventListener(type, event => {
+                    const source = preview.source;
+                    if (!attached(source) || source.disabled || preview.excluded ||
+                        this.config.selecting || display.carrier.getAttribute(HIDDEN) === "true") return;
+                    if ((type === "mouseover" || type === "mouseout") &&
+                        contains(display.carrier, event.relatedTarget)) return;
+                    const forwarded = document.createEvent("MouseEvent");
+                    forwarded.initMouseEvent(type, event.bubbles, event.cancelable, null,
+                        event.detail, event.screenX, event.screenY, event.clientX, event.clientY,
+                        event.ctrlKey, event.altKey, event.shiftKey, event.metaKey, event.button, null);
+                    source.dispatchEvent(forwarded);
+                    event.preventDefault();
+                    event.stopPropagation();
+                });
+            }
+        }
+        preview.source = item.button;
+        preview.excluded = excluded;
+        if (!excluded && !this.config.selecting) {
+            const tabIndex = item.button.getAttribute("tabindex");
+            if (tabIndex === null) display.button.removeAttribute("tabindex");
+            else display.button.setAttribute("tabindex", tabIndex);
+        } else {
+            display.button.setAttribute("tabindex", "-1");
+        }
+        return display;
+    }
+
+    placeButton(item, left, top, hidden) {
+        this.own(item.carrier);
+        item.carrier.setAttribute(MANAGED, "true");
+        item.carrier.setAttribute(HIDDEN, String(hidden));
+        item.carrier.style.setProperty("--mbm-left", `${(left - item.context.left) / item.context.scaleX}px`);
+        item.carrier.style.setProperty("--mbm-top", `${(top - item.context.top) / item.context.scaleY}px`);
+    }
+
     highlight(id, active) {
         this.highlighted = active ? id : null;
         const item = this.items.find(entry => entry.id === id);
-        if (!attached(item?.carrier)) return;
-        this.own(item.carrier);
-        if (active) item.carrier.setAttribute("data-mbm-highlight", "true");
-        else item.carrier.removeAttribute("data-mbm-highlight");
+        const carrier = this.previews.get(id)?.carrier ?? item?.carrier;
+        if (!attached(carrier)) return;
+        this.own(carrier);
+        if (active) carrier.setAttribute("data-mbm-highlight", "true");
+        else {
+            carrier.removeAttribute("data-mbm-highlight");
+            item?.carrier.removeAttribute("data-mbm-highlight");
+        }
     }
 
     refresh() {
@@ -536,16 +585,12 @@ export class DockController {
         const excluded = new Set(this.config.excluded.split("|").filter(Boolean));
         const included = this.config.enabled ? items.filter(item => item.supported && !excluded.has(item.id)) : [];
         const highlighted = items.find(item => item.id === this.highlighted);
+        const originals = this.config.enabled && this.config.selecting ? items.filter(item => item.supported) : included;
+        const previewIds = new Set(originals.map(item => item.id));
         // Excluded originals return to their native toolbar in both modes.
         this.restore(new Set([...included.map(item => item.carrier), ...Array.from(this.previews)
-            .filter(([id]) => this.config.enabled && this.config.selecting && excluded.has(id))
-            .map(([, preview]) => preview.carrier)]));
-        const previewIds = new Set();
-        const collected = this.config.enabled && this.config.selecting ? items.filter(item => item.supported).map(item => {
-            if (!excluded.has(item.id)) return item;
-            previewIds.add(item.id);
-            return this.preview(item);
-        }) : included;
+            .filter(([id]) => previewIds.has(id)).map(([, preview]) => preview.carrier)]));
+        const collected = originals.map(item => this.dockButton(item, excluded.has(item.id)));
         for (const [id, preview] of this.previews) {
             if (previewIds.has(id)) continue;
             preview.carrier.parentNode?.removeChild(preview.carrier);
@@ -567,19 +612,23 @@ export class DockController {
         collected.forEach((item, index) => {
             const local = index - start;
             const rect = item.carrier.getBoundingClientRect();
-            this.own(item.carrier);
-            item.carrier.setAttribute(MANAGED, "true");
-            item.carrier.setAttribute(HIDDEN, String(!this.open || local < 0 || local >= layout.capacity));
-            item.carrier.setAttribute("data-mbm-reordering", String(item.id === this.reordering));
-            item.carrier.setAttribute("data-mbm-excluded", String(!!this.config.selecting && excluded.has(item.id)));
             const left = layout.left + (Math.max(0, local) % layout.columns) * cell + (cell - rect.width) / 2;
             const top = layout.top + Math.floor(Math.max(0, local) / layout.columns) * cell + (cell - rect.height) / 2;
-            item.carrier.style.setProperty("--mbm-left", `${(left - item.context.left) / item.context.scaleX}px`);
-            item.carrier.style.setProperty("--mbm-top", `${(top - item.context.top) / item.context.scaleY}px`);
+            const hidden = !this.open || local < 0 || local >= layout.capacity;
+            this.placeButton(item, left, top, hidden);
+            item.carrier.setAttribute("data-mbm-reordering", String(item.id === this.reordering));
+            item.carrier.setAttribute("data-mbm-excluded", String(!!this.config.selecting && excluded.has(item.id)));
+            if (!excluded.has(item.id)) {
+                const original = originals[index];
+                const sourceRect = original.carrier.getBoundingClientRect();
+                this.placeButton(original, left + (rect.width - sourceRect.width) / 2,
+                    top + (rect.height - sourceRect.height) / 2, true);
+            }
         });
         if (highlighted) {
-            this.own(highlighted.carrier);
-            highlighted.carrier.setAttribute("data-mbm-highlight", "true");
+            const carrier = this.previews.get(highlighted.id)?.carrier ?? highlighted.carrier;
+            this.own(carrier);
+            carrier.setAttribute("data-mbm-highlight", "true");
         }
         const view = { items: items.map(({ id, name, supported }) => ({ id, name, supported })),
             excluded: this.config.excluded, count: included.length, page: this.page, pages: layout.pages,

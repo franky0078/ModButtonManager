@@ -65,12 +65,12 @@
     <Screenshot Value="Properties/Screenshot10.jpg" />-->
 	
     <Tag Value="Code Mod" />
-    <ModVersion Value="1.0.0" />
+    <ModVersion Value="1.0.1" />
     <GameVersion Value="1.6.*" />
     <ChangeLog>
 		Latest Changes:
 
-		- added Language support for all 12 in-game languages
+		- fixed collected mod buttons appearing on top of open game UI windows
 	</ChangeLog>
     <AccessLevel Value="Public" />
 
