@@ -6,3 +6,4 @@
 *.suo
 **/Frontend/build/
 test-results/
+ilpp.pid
